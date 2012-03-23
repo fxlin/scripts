@@ -1,0 +1,1 @@
+/home/xzl/GB/env.sh
