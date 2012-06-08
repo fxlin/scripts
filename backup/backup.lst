@@ -1,0 +1,25 @@
+#
+# backup list for rsync
+
+# Include
++ /dev/console
++ /dev/initctl
++ /dev/null
++ /dev/zero
+
+# Exclude
+- /var/tmp/*
+- /scratchbox/*
+- /root-obsolete/*
+# - /home/xzl/*
+/home/xzl/.gvfs
+- /opt/TI/*
+- /opt/IBM/*
+- /opt/toolchains/*
+- /dev/*
+- /proc/*
+- /sys/*
+- /tmp/*
+- lost+found/
+#- /media/backup/*
+- /media/*

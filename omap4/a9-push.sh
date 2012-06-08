@@ -2,7 +2,7 @@
 
 set -e
 
-OUT_DIR=/home/xzl/pandroid.gingerbread/L27.12.1-P2/mydroid/out/target/product/pandaboard/symbols/system/bin/
+OUT_DIR=/home/xzl/pandroid.gingerbread/L27.12.1-P2/mydroid/out/target/product/pandaboard/system/bin/
 TARGET_DIR=/data/syslink/
 
 echo push *.out to $TARGET_DIR

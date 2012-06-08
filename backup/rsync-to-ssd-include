@@ -1,0 +1,12 @@
+#!/bin/sh
+rsync -avP \
+--delete  \
+--stats   \
+--progress \
+--files-from=./files-from \
+--recursive \
+/media/a6b707b5-db4a-41d4-9f88-c0e67b7294a0/home/xzl/ \
+/home/xzl/
+
+
+#--include "*/"          \

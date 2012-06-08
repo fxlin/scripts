@@ -1,0 +1,12 @@
+#!/bin/sh
+rsync -avP \
+--delete  \
+--stats   \
+--files-from=./files-from \
+--recursive \
+/home/xzl/ \
+/media/sandisk/home/xzl/
+
+#--include "*/"          \
+
+cp -r /home/xzl/.??* /media/sandisk/home/xzl/

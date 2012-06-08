@@ -1,0 +1,10 @@
+#!/bin/sh
+rsync -avP \
+--exclude "Downloads/*"  \
+--exclude "My_Photos/*"  \
+--exclude "VirtualBox VMs/*" \
+--exclude "IBM/*"            \
+--delete --max-size=50m /media/a6b707b5-db4a-41d4-9f88-c0e67b7294a0/home/xzl/ /home/xzl/
+
+
+#--include "*/"          \

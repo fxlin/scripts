@@ -13,7 +13,7 @@ echo ========== push to android devices ==========
 #adb push test.sh $TARGET_DIR/
 #adb push gpio.sh $TARGET_DIR/
 
-files=`find -name "test*.xem3"`
+files=`find -name "*.xem3"`
 for f in $files 
 do
     T=$TARGET_DIR/`basename $f`

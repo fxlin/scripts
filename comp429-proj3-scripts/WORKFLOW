@@ -1,0 +1,51 @@
+CLEAR=free.clear.rice.edu
+CAI=cai.cs.rice.edu
+
+--------------------
+PREPARATION
+--------------------
+
+1. Grab the monolithic tar ball (bulk_download.zip) of submissions from Owlspace. 
+	- Owlspace: project3: grade: download all
+	
+2. On both CAI and CLEAR, unzip the tar ball. 
+	- Go to all student's folder,
+		- untar their submissions locally.
+		- make clean; make
+			
+3. Add your SSH pubkey to CAI's ~/.ssh/authroized_keys 
+
+4. On CLEAR, grab or build the timeout program from GNU coreutils, and put it 
+	in your exec path
+
+5. On both CAI and CLEAR, make sure that the folder structure is like this:
+|-- Project 3 Reliable File Transfer Protocol
+|-- project3_grading_instructions
+|-- testfiles -> project3_grading_instructions/testfiles/
+
+6. On CLEAR
+	$ source ./env.sh
+	
+--------------------	
+GRADE EACH SUBMISSION
+--------------------
+
+1. On both CAI and CLEAR, link student's programs to 
+	project3_grading_instructions/sendfile
+	project3_grading_instructions/recvfile
+
+2. On CAI, 
+	$ ./run.sh
+
+3. The log will be project3_grading_instructions/test.log. Move/rename test.log to logs/XXX.log
+
+
+NOTE: see run.sh for details
+
+--------------------	
+POST
+--------------------	
+
+1. run ./log2html.sh to convert all logs/*.log to logs/*.html
+
+
