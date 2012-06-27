@@ -1,0 +1,171 @@
+#!/usr/bin/env python
+
+import sys
+import re
+
+def warn(msg): sys.stderr.write("warning:" + msg + "\n")
+
+def err(msg):
+    sys.stderr.write(msg + "\n")
+    sys.exit(1)
+
+def done(msg):
+    sys.stderr.write(msg + "\n")
+    sys.exit(0)
+
+def extract_ts(line):
+    ex1 = r'''<([0-9\.]*)>'''
+    #ex1 = r'''<(.*)>'''
+    m = re.search(ex1, line)
+    if m:
+        return float(m.group(1))
+    else:
+        err("no timestamp found in line" + line)
+
+
+def extract_hist_ts(line):
+    ex1 = r'''{([0-9\.]*)}'''
+    m = re.search(ex1, line)
+    if m:
+        return float(m.group(1))
+    else:
+        err("no hist timestamp found in line" + line)
+
+
+INVALID = -9999
+
+ts_records = {}
+is_init_ts_record = False
+
+# True: add ok
+# False: add fail
+
+def try_add_lineno_record(k, lineno):    # must be in increasing line order
+    global is_init_ts_record
+
+    if lineno == INVALID:
+        return False
+
+    if not is_init_ts_record:
+        for key, v in keywords.iteritems():
+            ts_records[key] = []
+        is_init_ts_record = True
+
+    if not ts_records.has_key(k):
+        err("add_ts_record %s no found\n" %k)
+
+    if (len(ts_records[k]) > 0 and ts_records[k][-1] >= lineno):
+        return False
+    else:
+        ts_records[k].append(lineno)
+        return True
+
+def find_chkpt(line, checkpt):
+    if line.find(keywords[checkpt]) == -1:
+        return False;
+    else:
+        return True;
+
+def header():
+    sys.stderr.write("LINE APP_SEE_EVENT\t SF_BEFORE_SWAP_FB\t SF_AFTER_SWAP_FB\n")
+
+
+# not including this_line
+def find_chkpt_most_recent(lines, this_line, msg):
+    count = len(lines)
+    i = this_line - 1
+    while (i >= 0):
+        if (find_chkpt(lines[i], msg)):
+            if (extract_ts(lines[i]) <= extract_ts(lines[this_line])):
+                return i
+        i -= 1
+    return INVALID    # invalid
+
+def find_chkpt_most_recent_add(lines, this_line, tag):
+    line = find_chkpt_most_recent(lines, this_line, tag)
+    if line == INVALID:
+        raise Exception('invalid line', tag)
+
+    if try_add_lineno_record(tag, line) == False
+        raise Exception('no found line', tag)
+
+# not including this_line
+#
+# when this_line == -1, search start from line 0, and return whatever the 1st found
+def find_chkpt_next(lines, this_line, msg):
+    count = len(lines)
+    i = this_line + 1
+    while (i < count):
+        if (find_chkpt(lines[i], msg)):
+            if (this_line == -1) or (extract_ts(lines[i]) >= extract_ts(lines[this_line])):
+                return i
+        i += 1
+    return INVALID    # invalid
+
+def find_chkpt_next_add(lines, this_line, tag):
+    line = find_chkpt_next(lines, this_line, tag)
+    if line == INVALID:
+        raise Exception('invalid line', tag)
+
+    if try_add_lineno_record(tag, line) == False
+        raise Exception('no found line', tag)
+
+
+keywords = {
+"INPUT_EVENT_GEN"            : "ev hits user code",
+"APP_SEE_EVENT"                : "ev hits user code",
+"APP_BEFORE_DRAW_FRAME"         : "BEFORE GLSurfaceView DrawFrame",
+"APP_AFTER_DRAW_FRAME"        : "AFTER GLSurfaceView DrawFrame",
+"APP_BEFORE_SWAP_FRAME"        : "BEFORE GLSurfaceView swap frame",
+"APP_AFTER_SWAP_FRAME"        : "AFTER GLSurfaceView swap frame",
+"APP_QUEUE_FRAME"             : "SurfaceTextureClient::queueBuffer",
+"SF_QUEUE_FRAME"             : "Layer::onFrameQueued",
+"SF_BEFORE_SWAP_FB"             : "prepare to swap fb",
+"SF_AFTER_SWAP_FB"             : "swap fb done",
+}
+
+if __name__ == "__main__":
+    f=file(sys.argv[1])
+    lines = f.readlines()
+    count = len(lines)
+
+    app_see_event_line = 0
+    app_before_draw_frame_line = 0
+    app_after_draw_frame_line = 0
+    app_before_swap_frame_line = 0
+    app_queue_frame_line = 0
+    sf_queue_frame_line = 0
+    sf_before_swap_fb_line = 0
+    sf_ater_swap_fbline = 0
+
+    header()
+
+    while(True):
+        swap_fb_ts= INVALID
+        swap_fb_done_ts = INVALID
+        queue_frame_ts = INVALID
+        hit_app_ts = INVALID
+        event_ts    = INVALID
+
+        try:
+            sf_before_swap_fb_line      = find_chkpt_next_add(lines, sf_before_swap_fb_line - 1, "SF_BEFORE_SWAP_FB")
+            sf_queue_frame_line         = find_chkpt_most_recent_add(lines, sf_before_swap_fb_line, "SF_QUEUE_FRAME")
+            app_queue_frame_line        = find_chkpt_most_recent_add(lines, sf_queue_frame_line, "APP_QUEUE_FRAME")
+            app_before_swap_frame_line  = find_chkpt_most_recent_add(lines, app_queue_frame_line, "APP_BEFORE_SWAP_FRAME")
+            app_after_draw_frame_line   = find_chkpt_most_recent_add(lines, app_before_swap_frame_line, "APP_AFTER_DRAW_FRAME")
+            app_before_draw_frame_line  = find_chkpt_most_recent_add(lines, app_after_draw_frame_line, "APP_BEFORE_DRAW_FRAME")
+            app_see_event_line          = find_chkpt_most_recent_add(lines, app_see_event_line, "APP_SEE_EVENT")
+        except Exception as e:
+            warn("event chain not complete, skip" + e.args[1])
+            sf_before_swap_fb_line += 1 # get over the current line, move on
+            continue
+
+        #swap_fb_ts = extract_ts(lines[sf_before_swap_fb_line])
+        #queue_frame_ts = extract_ts(lines[sf_queue_frame_line])
+        #event_ts   = extract_hist_ts(lines[last_i])
+
+        #print last_i+1, j+1, k+1, "\t\t\t",
+        #print event_ts, hit_app_ts, swap_fb_ts, swap_fb_done_ts,
+        #print "\t\t\t", hit_app_ts - event_ts, swap_fb_ts - hit_app_ts, swap_fb_done_ts - swap_fb_ts
+        sf_before_swap_fb_line += 1
+

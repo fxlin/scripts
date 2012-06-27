@@ -1,0 +1,112 @@
+#!/usr/bin/env python
+
+import sys
+import re
+
+def warn(msg):
+	sys.stderr.write("warning:" + msg + "\n")
+	
+def err(msg):
+	sys.stderr.write(msg + "\n")
+	sys.exit(1)
+	
+def done(msg):
+	sys.stderr.write(msg + "\n")
+	sys.exit(0)
+		
+def extract_ts(line):
+	ex1 = r'''<([0-9\.]*)>'''
+	#ex1 = r'''<(.*)>'''	
+	m = re.search(ex1, line)
+	if m:
+		return float(m.group(1))
+	else:
+		err("no timestamp found in line" + line)
+
+		
+def extract_hist_ts(line):
+	ex1 = r'''{([0-9\.]*)}'''
+	m = re.search(ex1, line)
+	if m:
+		return float(m.group(1))
+	else:
+		err("no hist timestamp found in line" + line)
+				
+
+keywords = {
+"APP_SEE_EVENT"				: "ev hits user code",
+"APP_BEFORE_DRAW_FRAME" 	    : "BEFORE GLSurfaceView DrawFrame",
+"APP_AFTER_DRAW_FRAME"		: "AFTER GLSurfaceView DrawFrame",
+"APP_BEFORE_SWAP_FRAME"		: "BEFORE GLSurfaceView swap frame",
+"APP_AFTER_SWAP_FRAME"		: "AFTER GLSurfaceView swap frame",
+"SF_QUEUE_FRAME"             : "Layer::onFrameQueued",
+"SF_BEFORE_SWAP_FB" 		    : "prepare to swap fb",
+"SF_AFTER_SWAP_FB"	 		: "swap fb done",
+}
+
+def find_chkpt(line, checkpt):
+	if line.find(keywords[checkpt]) == -1:
+		return False;
+	else:
+		return True;
+		
+def header():
+	sys.stderr.write("LINE APP_SEE_EVENT\t SF_BEFORE_SWAP_FB\t SF_AFTER_SWAP_FB\n")
+
+if __name__ == "__main__":
+	f=file(sys.argv[1])
+	lines = f.readlines()
+	count = len(lines)
+	i = 0
+	j = 0 
+	k = 0
+	
+	header()
+		
+	while(True):
+		swap_fb_ts= -9999
+		swap_fb_done_ts = -9999
+		hit_app_ts = -9999	
+		event_ts	= -9999
+		
+		while(not find_chkpt(lines[j], "SF_BEFORE_SWAP_FB")):
+			j += 1;
+			if (j == count):
+				done("done")
+		swap_fb_ts = extract_ts(lines[j]) 
+		
+		last_i = -9999
+		while (1):
+			if (find_chkpt(lines[i], "APP_SEE_EVENT")):
+				hit_app_ts = extract_ts(lines[i])
+				if (hit_app_ts > swap_fb_ts): # already ahead of the before_swap_fb event
+					if (last_i == -9999): 
+						#warn("line " + str(j+1) + ": no hit_app ev found for before_swap_fb")
+						break
+					hit_app_ts = extract_ts(lines[last_i])
+					event_ts   = extract_hist_ts(lines[last_i])
+					break
+				else:
+					last_i = i	 # record this position, continue move forward to search													
+			i += 1; 
+			if (i == count):
+				done("done")
+			
+		if (last_i == -9999):
+			warn("line " + str(j + 1) + ": most recent hit app no found, skip")
+			j += 1
+			continue
+			
+		k = j
+		while(not find_chkpt(lines[k], "SF_AFTER_SWAP_FB")):
+			k += 1;
+			if (k == count):
+				done("done")			
+		swap_fb_done_ts = extract_ts(lines[k]) 		
+		
+		print last_i+1, j+1, k+1, "\t\t\t",
+		print event_ts, hit_app_ts, swap_fb_ts, swap_fb_done_ts,
+		print "\t\t\t", hit_app_ts - event_ts, swap_fb_ts - hit_app_ts, swap_fb_done_ts - swap_fb_ts		
+		j += 1		
+			
+			
