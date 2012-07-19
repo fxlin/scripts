@@ -1,0 +1,27 @@
+# clustered and stacked graph example w/ bogus data
+=stackcluster;Shared;Home-specific;Browser-specific
+=sortbmarks
+=nogridy
+=noupperright
+#=color_per_datum
+#colors=black,green,red
+
+legendx=right
+legendy=center
+yformat=%g%%
+xlabel=Benchmark
+ylabel=Percentage of total heap usage
+
+=table
+
+multimulti=kernel
+home              25 0 30
+browser           25 30 0 
+
+multimulti=net
+home              25 0 30
+browser           25 30 0 
+
+multimulti=device
+home              25 0 30
+browser           25 30 0 

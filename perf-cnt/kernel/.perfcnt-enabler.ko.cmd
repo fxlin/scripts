@@ -1,0 +1,1 @@
+cmd_/home/xzl/build_tools/scripts/perf-cnt/kernel/perfcnt-enabler.ko := arm-none-linux-gnueabi-ld -EL -r  -T /home/xzl/syslink-honza/kernel/scripts/module-common.lds --build-id -o /home/xzl/build_tools/scripts/perf-cnt/kernel/perfcnt-enabler.ko /home/xzl/build_tools/scripts/perf-cnt/kernel/perfcnt-enabler.o /home/xzl/build_tools/scripts/perf-cnt/kernel/perfcnt-enabler.mod.o

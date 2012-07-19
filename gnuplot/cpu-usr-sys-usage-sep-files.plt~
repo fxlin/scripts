@@ -1,0 +1,89 @@
+#
+# plot a part of data file
+# http://phaselockfel.blogspot.com/2007/05/gnuplot-plot-part-of-data-file.html
+#
+#
+# logscale 
+# set logscale X
+#
+   #set term png 
+   set term emf "Arial,10" size 500,200
+
+    set lmargin 1
+    set bmargin 2
+    set rmargin 1
+    set tmargin 2
+    
+    set format y "%g %%"
+
+    
+    set size ratio 0.33
+    
+
+    set yrange [0:60]
+    set xrange [0:80]
+    
+#################################################
+        
+        
+    set title "Home"
+            
+    set output "/home/xzl/Dropbox/measurements/cpu-usage/per-thread-usr-sys/output/home.emf"               
+    
+    plot "s2/home-swipe3.log" u  ($0/4):($4+$5)*100 w filledcurve x1 lc rgb "gray" title "User", \
+         "s2/home-swipe3.log" u  ($0/4):($3*100) w filledcurve x1 lc rgb "blue" title "OS"
+         
+#################################################
+        
+unset key
+                         
+    set title "Home"
+    
+            
+    set output "/home/xzl/Dropbox/measurements/cpu-usage/per-thread-usr-sys/output/home5.emf"               
+    
+
+    set label 1 "Calendar\n animation" font "Arial, 8" at 5, 50   
+    set arrow from 15,50 to 20,50
+    
+    plot "s2/home5.log" u ($0/4):($5+$6)*100 every ::80 w filledcurve x1 lc rgb "gray" title "User", \
+         "s2/home5.log" u ($0/4):($6*100)    every ::80 w filledcurve x1 lc rgb "blue" title "OS"
+                  
+
+#################################################
+
+unset key
+         
+         
+    set title "Pandora"
+             
+    set output "/home/xzl/Dropbox/measurements/cpu-usage/per-thread-usr-sys/output/pandora.emf"               
+             
+    plot "s2/pandora.log" u ($0/4):($5+$6)*100 w filledcurve x1 lc rgb "gray" title "User", \
+         "s2/pandora.log" u ($0/4):($6*100) w filledcurve x1 lc rgb "blue" title "OS"         
+         
+#################################################
+      
+unset key
+         
+    set title "Youtube"         
+    
+    set output "/home/xzl/Dropbox/measurements/cpu-usage/per-thread-usr-sys/output/youtube.emf"               
+             
+    plot "s2/youtube.log" u  ($0/4):($5+$6)*100 w filledcurve x1 lc rgb "gray" title "User", \
+         "s2/youtube.log" u  ($0/4):($6*100) w filledcurve x1 lc rgb "blue" title "OS"           
+         
+#################################################
+      
+unset key
+         
+    
+    set title "MediaServer"         
+    
+    set output "/home/xzl/Dropbox/measurements/cpu-usage/per-thread-usr-sys/output/mediaserver.emf"               
+             
+    plot "s2/mediaserver2.log" u  ($0/4):($5+$6)*100 w filledcurve x1 lc rgb "gray" title "User", \
+         "s2/mediaserver2.log" u  ($0/4):($6*100) w filledcurve x1 lc rgb "blue" title "OS"
+         
+         
+                             

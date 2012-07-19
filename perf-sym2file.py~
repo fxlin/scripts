@@ -1,0 +1,79 @@
+#!/usr/bin/env python
+
+import sys
+
+'''
+given kernel symbols in perf report output, output statistics of kernel source files
+
+ $1 - output of systemmap2file.sh
+ $2 - output of perf report 
+'''
+
+
+    
+# read the 'enhanced system.map' with source location --- output of systemmap2file.sh
+# create a dict {sym, source}
+
+def load_sysmap(fname):
+    sym_dict = {}
+    f = file(fname)
+    lines = f.readlines()
+    for line in lines:
+        [addr, sym, src] = line.split()
+        sym_dict[sym] = src
+    return sys_dict
+    
+# load perf output
+#
+# overhead  command
+
+def load_perf_out(fname):
+    perf_dict = {}
+    f = file(fname)
+    lines = f.readlines()
+    for line in lines:
+        try:
+            percent=line[5:9]
+            is_ker=line[62:65]        
+            sym=line[66:].split()[0]
+            if (is_ker == '[k]'):
+                perf_dict[sym] = percent
+                print sym, percent
+        except:
+            print 'skip line:' + line                
+
+
+def src_to_subsys(src):
+    #ker_prefix="/home/xzl/android-galaxys2/samsung-kernel-galaxysii/"
+    ker_prefix="/media/vodka/home/xzl/android-galaxys2/siyah-kernel-ICS/siyahkernel3/"
+    ker_paths = [
+        "drivers/",
+            "drivers/gpu/",
+            "drivers/net/",
+            "drivers/video/",
+            "drivers/media/",
+            "drivers/usb/",
+            "drivers/base/",
+            "drivers/staging/android/",
+        "kernel/",
+                "kernel/timer.c",            
+                "kernel/softirq.c",
+                "kernel/sched.c",
+                "kernel/futex.c",
+        "mm/",
+        "arch/arm/",
+            "arch/arm/oprofile/",
+            "arch/arm/mach-s5pv310/cpuidle.c",
+        "fs/",
+        "net/",
+    ]
+
+    for i in (range(0, len(ker_paths))):
+        p = ker_paths[i]
+        ker_paths[i] = ker_prefix + p
+    
+    for kp in ker_paths:
+        if kp in src:
+            return kp
+            
+load_perf_out(sys.argv[1])    

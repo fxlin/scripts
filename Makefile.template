@@ -1,0 +1,8 @@
+LOG=$(wildcard *.log)
+CSV=$(patsubst %.log,%.csv,$(LOG))
+
+all: $(CSV)
+
+%.csv: %.log
+	~/build_tools/scripts/txt2csv.py $^ > $@
+
