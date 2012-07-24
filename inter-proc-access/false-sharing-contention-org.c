@@ -26,6 +26,15 @@ iterations: 1<<32
  3) 147.06 8.76168e+07 ips
  4) 194.092 8.85139e+07 ips
 
+=================================
+on galaxy s2 (exyons)
+
+iterations 1<<28
+1) 17.3351 1.54851e+07 ips
+2) 24.0765 2.22985e+07 ips
+3) 30.4564 2.64413e+07 ips
+4) 37.0298 2.89967e+07 ips
+
  */
 
 #include <pthread.h>
@@ -35,7 +44,7 @@ iterations: 1<<32
 #include <sys/time.h>
 
 #define NUM_THREADS 4
-#define NUM_ITERATIONS ((uint64_t)1 << 32)    // xzl: for shorter run time: 1<<28 for omap4, 1<<32 for x86 
+#define NUM_ITERATIONS ((uint64_t)1 << 28)    // xzl: for shorter run time: 1<<28 for omap4, 1<<32 for x86 
 
 uint32_t *data;
 
