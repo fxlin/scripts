@@ -13,6 +13,8 @@
 # http://gnuplot.sourceforge.net/demo/key.html
 #
 #
+# color #1E90FF --- dodger blue
+#
 
    #set term png 
    set term emf "Arial,10" size 500,200
@@ -103,10 +105,10 @@ unset title
     set xrange [0:80]
     set yrange [0:100]
 
-    unset lmargin 
+#    unset lmargin 
  #    unset bmargin                        
-                    set ylabel "CPU Usage"
-                    set xlabel "Time/Sec"
+#                    set ylabel "CPU Usage"
+#                    set xlabel "Time/Sec"
                     
                         
 #             set title "Home-Swipe"     
@@ -115,8 +117,8 @@ unset title
              
         
     plot "s2/home-swipe-w-global-cpu-2.log" u  ($0/4):($7+$8)*100 w filledcurve x1    lc rgb "gray" title "Rest of System", \
-        "s2/home-swipe-w-global-cpu-2.log" u  ($0/4):($5+$6)*100 w filledcurve x1    lc rgb "blue" title "Thread:User", \
-        "s2/home-swipe-w-global-cpu-2.log" u  ($0/4):($6*100) w filledcurve x1       lc rgb "red" title "Thread:Kernel"
+        "s2/home-swipe-w-global-cpu-2.log" u  ($0/4):($5+$6)*100 w filledcurve x1    lc rgb "#1E90FF" title "Thread:User", \
+        "s2/home-swipe-w-global-cpu-2.log" u  ($0/4):($6*100) w filledcurve x1       lc rgb "black" title "Thread:Kernel"
 
 #################################################
       
@@ -128,8 +130,8 @@ unset key
     set output "/home/xzl/Dropbox/measurements/cpu-usage/per-thread-usr-sys/output/pandora-playing-songswitch-pause-w-global-cpu.emf"                            
         
     plot "s2/pandora-playing-songswitch-pause-w-global-cpu.log" u  ($0/4):($7+$8)*100 w filledcurve x1    lc rgb "gray" title "Global", \
-        "s2/pandora-playing-songswitch-pause-w-global-cpu.log" u  ($0/4):($5+$6)*100 w filledcurve x1    lc rgb "blue" title "User", \
-        "s2/pandora-playing-songswitch-pause-w-global-cpu.log" u  ($0/4):($6*100) w filledcurve x1       lc rgb "red" title "Kernel"         
+        "s2/pandora-playing-songswitch-pause-w-global-cpu.log" u  ($0/4):($5+$6)*100 w filledcurve x1    lc rgb "red" title "User", \
+        "s2/pandora-playing-songswitch-pause-w-global-cpu.log" u  ($0/4):($6*100) w filledcurve x1       lc rgb "black" title "Kernel"         
                                        
                                        
 #################################################
@@ -140,9 +142,9 @@ unset title
     set xrange [0:80]
     set yrange [0:100]
                     
-    unset lmargin 
+#    unset lmargin 
 #    unset bmargin 
-    unset rmargin 
+#    unset rmargin 
 #    unset tmargin 
                         
                     set ylabel "CPU Usage"
@@ -151,8 +153,8 @@ unset title
     set output "/home/xzl/Dropbox/measurements/cpu-usage/per-thread-usr-sys/output/gmail-typing-opening-reading-opening-w-globalcpu.emf"                            
         
     plot "s2/gmail-typing-opening-reading-opening-w-globalcpu.log" u  ($0/4):($7+$8)*100 w filledcurve x1    lc rgb "gray" title "Rest of System", \
-        "s2/gmail-typing-opening-reading-opening-w-globalcpu.log" u  ($0/4):($5+$6)*100 w filledcurve x1    lc rgb "blue" title "Thread-User", \
-        "s2/gmail-typing-opening-reading-opening-w-globalcpu.log" u  ($0/4):($6*100) w filledcurve x1       lc rgb "red" title "Kernel"         
+        "s2/gmail-typing-opening-reading-opening-w-globalcpu.log" u  ($0/4):($5+$6)*100 w filledcurve x1    lc rgb "#1E90FF" title "Thread-User", \
+        "s2/gmail-typing-opening-reading-opening-w-globalcpu.log" u  ($0/4):($6*100) w filledcurve x1       lc rgb "black" title "Kernel"         
                                        
                                        
                                                                               
