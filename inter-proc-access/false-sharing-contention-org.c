@@ -37,7 +37,7 @@ iterations: 1<<32
 #define NUM_THREADS 4
 #define NUM_ITERATIONS ((uint64_t)1 << 32)    // xzl: for shorter run time: 1<<28 for omap4, 1<<32 for x86 
 
-uint64_t *data;
+uint32_t *data;
 
 void *thread_function( void *args )
 {
@@ -46,7 +46,7 @@ void *thread_function( void *args )
 
    for ( i = 0; i < NUM_ITERATIONS; i++ )
    {
-       data[j] = i;
+       data[j] = (uint32_t)(i & 0xffffffff);
    }
 
    return NULL;
@@ -59,7 +59,7 @@ int main( int argc, char **argv )
    struct timeval start, end;
    double d;
 
-   data = (uint64_t*)malloc( sizeof(uint64_t)*NUM_THREADS );
+   data = (uint32_t*)malloc( sizeof(uint32_t)*NUM_THREADS );
 
    for ( j = 1; j <= NUM_THREADS; j++ )
    {
