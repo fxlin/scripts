@@ -1,0 +1,40 @@
+Galaxy S2 + ICS
+
+arm cortex-a9 performance counters:
+ ARMV7_PERFCTR_MEM_WRITE = 0x07,
+ ARMV7_PERFCTR_L1_DCACHE_REFILL = 0x03,
+ ARMV7_PERFCTR_L1_DCACHE_ACCESS = 0x04,
+ ARMV7_PERFCTR_MEM_READ = 0x06,
+
+/data/local # perf stat -e cache-references,cache-misses,cycles,r007,r003,r004,r006 -B  ./forward-write.arm
+write to 16384 KB buffer, iterations = 16
+10.2801 sec 0
+
+ Performance counter stats for './forward-write.arm':
+
+        2194470278 cache-references
+           4749372 cache-misses              #    0.216 % of all cache refs
+        5048730960 cycles                    #    0.000 GHz
+         815322972 r007
+           4749372 r003
+        2194470278 r004
+        1353380736 r006
+
+      10.318971106 seconds time elapsed
+
+/data/local # perf stat -e cache-references,cache-misses,cycles,r007,r003,r004,r006 -B  ./random-write.arm 
+write to 16384 KB buffer, iterations = 16
+29.3814 sec
+
+ Performance counter stats for './random-write.arm':
+
+        2449981260 cache-references                                            
+         272316961 cache-misses              #   11.115 % of all cache refs    
+       14465690144 cycles                    #    0.000 GHz                    
+         817646599 r007                                                        
+         272316961 r003                                                        
+        2449981260 r004                                                        
+        1358341109 r006                                                        
+
+      29.417720417 seconds time elapsed
+
