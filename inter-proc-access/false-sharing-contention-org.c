@@ -69,6 +69,7 @@ NUM_THREAD = 2 NUM_ITERATIONS = 268435456
 int NUM_THREADS=2;
 uint32_t *data;
 
+
 void *thread_function( void *args )
 {
    uint64_t i;
@@ -91,14 +92,30 @@ void *thread_function( void *args )
     }
     // -----------------------------------------
 
+    long index = j * 63;
+
    for ( i = 0; i < NUM_ITERATIONS; i++ )
    {
-       //data[j] = (uint32_t)(i & 0xffffffff);      // W
-       data[j] += (uint32_t)(i & 0xffffffff);     // R+W
+       // XXX how to defeat prefetching???
+       //index = (index * 13 + 1) % 64;
+       //printf("thread %d index %d\n", j, index);
+       //index = (index + 31) & 63;  // not working
+
+       //index = 63 - index;
+
+       data[j] += (uint32_t)(i & 0xffffffff);      // W, subject to opt?
+
+       // not quite working
+       //asm volatile ("dmb");
+
+       // random access, to defeat prefetching
+       //data[j] = (uint32_t)(i & 0xffffffff);      // W, subject to opt?
+       //data[j] += (uint32_t)(i & 0xffffffff);     // R+W
        //k += data[j];                                // R     read only, shouldn't harm scalability
+       //data[0] = 0xffffffff;     // R, should no other mem access
    }
 
-   printf("%ld", k); // consume the data
+   printf("%ld", data[j]); // consume the data
    return NULL;
 }
 
@@ -114,7 +131,13 @@ int main( int argc, char **argv )
    }
    printf("NUM_THREAD = %d NUM_ITERATIONS = %lu\n", NUM_THREADS, NUM_ITERATIONS);
 
-   data = (uint32_t*)malloc( sizeof(uint32_t)*NUM_THREADS );
+   //data = (uint32_t*)malloc( sizeof(uint32_t)*NUM_THREADS );
+   data = (uint32_t*)malloc( sizeof(uint32_t)*64 );
+
+   if (!data) {
+       perror("malloc");
+       return 1;
+   }
 
    for ( j = 1; j <= NUM_THREADS; j++ )
    {

@@ -1,10 +1,12 @@
 SRC=$(wildcard *.c)
 OBJ=$(patsubst %.c,%.arm,$(SRC))
-CC=arm-linux-gnueabi-gcc
 LIBS=-lpthread -lrt
 
-# app specific
+CC=arm-linux-gnueabi-gcc
+#CC=cc
+#CFLAGS=-O2
 
+# app specific
 
 all: $(OBJ)
 
@@ -15,5 +17,5 @@ install:
 	find -name "*.arm" -exec adb push "{}" /data/local/ \;
 
 %.arm: %.c
-	$(CC) -static $^ $(LIBS) -o $@
+	$(CC) -static $^ $(LIBS) $(CFLAGS) -o $@
 

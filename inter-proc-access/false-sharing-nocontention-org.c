@@ -32,7 +32,7 @@ felix.recg.rice.edu (8-core machine)
 #define NUM_THREADS 2
 #define NUM_ITERATIONS ((uint64_t)1 << 28)    // xzl: for shorter run time: 1<<28 for omap4, 1<<30 for x86 
 
-#define CACHE_SIZE 128
+#define CACHE_SIZE 512          // 512 works for i5 3550; 256 seems not
 
 typedef struct {
    uint32_t d;
@@ -63,12 +63,29 @@ void *thread_function( void *args )
     }
     // -----------------------------------------
 
+    long index = j * 63;
    for ( i = 0; i < NUM_ITERATIONS; i++ )
    {
+       // random access, to defeat prefetching
+       //index = (index * 13 + 1) % 64;   // won't work. the computation does not scale with threads??
+       //index = (index + 31) & 63;
+       //printf("thread %d index %d\n", j, index);
+
+       //index = 63 - index;            // only a small computation here will harm scalability, why?
+
+       data[j].d += (uint32_t)(i & 0xffffffff);      // W, subject to opt?
+    
+       // not quite working
+       //asm volatile ("dmb");
+
+       //data[63-index].d += (uint32_t)(i & 0xffffffff);      // W, subject to opt?
+
        //data[j].d = i;
-        data[j].d += (uint32_t)(i & 0xffffffff);       
+       //data[j].d = (uint32_t)(i & 0xffffffff);      // W, subject to opt?
+        //data[j].d += (uint32_t)(i & 0xffffffff);       
    }
    
+   printf("%ld", data[j]); // consume the data
    return NULL;
 }   
    
@@ -81,7 +98,8 @@ int main( int argc, char **argv )
    
    printf("NUM_THREAD = %d NUM_ITERATIONS = %lu\n", NUM_THREADS, NUM_ITERATIONS);
    
-   data = (Data*)malloc( sizeof(Data)*NUM_THREADS );
+   //data = (Data*)malloc( sizeof(Data)*NUM_THREADS );
+   data = (Data*)malloc( sizeof(Data)*64 );
        
    for ( j = 1; j <= NUM_THREADS; j++ )
    {       

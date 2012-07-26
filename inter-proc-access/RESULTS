@@ -1,3 +1,6 @@
+update: as expected (false sharing harms scalability) on i5 3550 w/o -O2. 100% overhead
+but not on Exynos. seems other non-missing mem accesses dominate. only 10-20% overhead
+
 Galaxy S2 + ICS
 
 arm cortex-a9 performance counters:
