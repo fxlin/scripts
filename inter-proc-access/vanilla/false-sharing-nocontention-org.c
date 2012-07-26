@@ -1,3 +1,9 @@
+#include <pthread.h>
+#include <stdio.h>
+#include <stdint.h>
+#include <stdlib.h>
+#include <sys/time.h>
+
 /*
  
 cc false-sharing-org.c -lpthread -lrt  -o false-sharing-org-x86
@@ -22,51 +28,26 @@ felix.recg.rice.edu (8-core machine)
 
 */
 
-#include <pthread.h>
-#include <stdio.h>
-#include <stdint.h>
-#include <stdlib.h>
-#include <sys/time.h>
-#include <errno.h>
-
-#define NUM_THREADS 2
-#define NUM_ITERATIONS ((uint64_t)1 << 28)    // xzl: for shorter run time: 1<<28 for omap4, 1<<30 for x86 
+#define NUM_THREADS 4
+#define NUM_ITERATIONS (1L << 30)
 
 #define CACHE_SIZE 128
 
 typedef struct {
-   uint32_t d;
-   char buffer[CACHE_SIZE-sizeof(uint32_t)];
+   long d;
+   char buffer[CACHE_SIZE-sizeof(long)];
 } Data;
 
 Data *data;
    
 void *thread_function( void *args )
 {
-   uint64_t i;
+   long i; 
    long j = (long)args;
        
-
-    // ----------------- affinity --------------
-    unsigned long mask;
-    int s;
-    mask = 1 << (j % 2); // we have 2 cpus on omap4.  
-    printf("try affinity index %d ===> cpu %ld ... \n", j, mask);
-    s = pthread_setaffinity_np(pthread_self(), sizeof(mask), &mask);    
-    if (s != 0) {
-        errno = s;
-        perror("pthread_setaffinity_np");
-        //printf("pthread_setaffinity_np failed %d", s);
-        exit(1);
-    } else {
-        printf("thread_function index %d ===> cpu %ld\n", j, mask);
-    }
-    // -----------------------------------------
-
    for ( i = 0; i < NUM_ITERATIONS; i++ )
    {
-       //data[j].d = i;
-        data[j].d += (uint32_t)(i & 0xffffffff);       
+       data[j].d = i;
    }
    
    return NULL;
@@ -78,8 +59,6 @@ int main( int argc, char **argv )
    pthread_t ids[NUM_THREADS-1];
    struct timeval start, end;
    double d;
-   
-   printf("NUM_THREAD = %d NUM_ITERATIONS = %lu\n", NUM_THREADS, NUM_ITERATIONS);
    
    data = (Data*)malloc( sizeof(Data)*NUM_THREADS );
        

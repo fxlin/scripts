@@ -1,0 +1,54 @@
+Galaxy S2 + ICS
+
+arm cortex-a9 performance counters:
+ ARMV7_PERFCTR_MEM_WRITE = 0x07,
+ ARMV7_PERFCTR_L1_DCACHE_REFILL = 0x03,
+ ARMV7_PERFCTR_L1_DCACHE_ACCESS = 0x04,
+ ARMV7_PERFCTR_MEM_READ = 0x06,
+ 
+bash-3.2# perf stat -e cache-references,cache-misses,cycles,r007,r003,r004,r006 -B  ./false-sharing-nocontention-org.arm 
+NUM_THREAD = 2 NUM_ITERATIONS = 268435456
+try affinity index 0 ===> cpu 1 ... 
+thread_function index 0 ===> cpu 1
+1) 6.78535 3.9561e+07 ips
+try affinity index 1 ===> cpu 2 ... 
+try affinity index 0 ===> cpu 1 ... 
+thread_function index 0 ===> cpu 1
+thread_function index 1 ===> cpu 2
+2) 6.93022 7.74681e+07 ips
+
+ Performance counter stats for './false-sharing-nocontention-org.arm':
+
+        8872678754 cache-references                                            
+            255019 cache-misses              #    0.003 % of all cache refs    
+       23374243578 cycles                    #    0.000 GHz                    
+        1613784535 r007                                                        
+            255019 r003                                                        
+        8872678753 r004                                                        
+        6449425373 r006                                                        
+
+      13.722407884 seconds time elapsed
+
+bash-3.2# perf stat -e cache-references,cache-misses,cycles,r007,r003,r004,r006 -B  ./false-sharing-contention-org.arm   
+NUM_THREAD = 2 NUM_ITERATIONS = 268435456
+try affinity index 0 ===> cpu 1 ... 
+thread_function index 0 ===> cpu 1
+01) 7.05816 3.80319e+07 ips
+try affinity index 1 ===> cpu 2 ... 
+thread_function index 1 ===> cpu 2
+try affinity index 0 ===> cpu 1 ... 
+thread_function index 0 ===> cpu 1
+002) 8.48646 6.3262e+07 ips
+
+ Performance counter stats for './false-sharing-contention-org.arm':
+
+        8687801606 cache-references                                            
+         344648737 cache-misses              #    3.967 % of all cache refs    
+       27425150513 cycles                    #    0.000 GHz                    
+        1614260185 r007                                                        
+         344648737 r003                                                        
+        8687801607 r004                                                        
+        6450439883 r006                                                        
+
+      15.550527670 seconds time elapsed
+
