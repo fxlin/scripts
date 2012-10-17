@@ -3,7 +3,8 @@
 
 set -e
 
-TARGET_DIR=/data/syslink/
+#TARGET_DIR=/data/syslink/
+TARGET_DIR=/system/bin/
 
 echo push *.xem3 to $TARGET_DIR
 echo ========== push to android devices ==========
