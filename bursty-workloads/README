@@ -1,5 +1,36 @@
 used for emulating bursty workloads
 
+
 build and run for panda OK.
+
+
+TO BUILD:
+1. plug in usb cable to device
+./build.sh
+
+
+TO RUN:
+1. plug in usb cable to device
+
+adb shell
+
+~ # cd /data/local/ && ./nohup ./bursty&
+nohup: appending output to nohup.out
+
+
+2. verify it runs
+
+~ # ps |grep bursty
+ 1530 root       640 S    ./bursty
+  1600 root      1820 S    grep bursty
+
+
+3. unplug usb cable (with the power cord plugged, otherwise panda loses power)
+
+4. plug usb cable back, repeat step 2, to see verify bursty is still alive 
+
+Measurement should be taken between step 3 and 4.
+
+
 
 TODO: before busy(), toggle some GPIO line so that the starting point of the workloads can be observed by external oscilloscope.

@@ -27,6 +27,8 @@ int main(int argc, char **argv) {
     struct timeval tv;
     unsigned int k;
 
+    printf(" --- bursty starts ---\n");
+
     while (1) {
         sleep(SLEEP_INTERVAL_SEC);
 
