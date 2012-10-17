@@ -1,0 +1,5 @@
+used for emulating bursty workloads
+
+build and run for panda OK.
+
+TODO: before busy(), toggle some GPIO line so that the starting point of the workloads can be observed by external oscilloscope.
