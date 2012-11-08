@@ -181,7 +181,6 @@ int main(int argc, char *argv[]) {
     readone(&cpufreq_core0);
     fclose(input);
 
-/*
     input = fopen("/sys/devices/system/cpu/cpu1/cpufreq/scaling_cur_freq", "r");
     if (input == NULL) {
         perror("fopen core1");
@@ -189,7 +188,7 @@ int main(int argc, char *argv[]) {
     }     
     readone(&cpufreq_core1);
     fclose(input);
-*/    
+
     //---------------------------------    
    
     // per proc/thread /proc/pid/stat
@@ -287,7 +286,7 @@ int main(int argc, char *argv[]) {
     last_global_sys = global_sys;
 
     //sleep(1);
-    usleep(sleep_ms * 1000);
+    usleep(sleep_ms * 1000); // if you want to change interval, don't change here. change the def of sleep_ms
 
     /*
     printtime("cutime", cutime);
