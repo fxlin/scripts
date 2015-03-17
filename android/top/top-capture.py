@@ -39,7 +39,7 @@ def capture():
   parser.add_option('-o', dest='output_file', help='write HTML to FILE',
                     default='top.trace', metavar='FILE')
   parser.add_option('-t', '--time', dest='trace_time', type='int',
-                    help='trace for N seconds', metavar='N')
+                    default='1', help='trace for N seconds', metavar='N')
   parser.add_option('-b', '--buf-size', dest='trace_buf_size', type='int',
                     help='use a trace buffer size of N KB', metavar='N')
   parser.add_option('-d', '--disk', dest='trace_disk', default=False,
@@ -97,10 +97,15 @@ def capture():
     return
 
   # xzl: the actual adb command
-  atrace_args = ['adb', 'shell', 'top', '-n', '10']
+  atrace_args = ['adb', 'shell', 'top']
   add_adb_serial(atrace_args, options.device_serial)
 
   # --- xzl: parsing cmdline and add to target cmd as needed --- 
+
+  if options.trace_time > 0:
+    atrace_args.extend(['-n', str(options.trace_time)])
+  else:
+    parser.error('the trace time must be a positive number')
 
   '''if options.trace_disk:
     atrace_args.append('-d')
@@ -116,11 +121,6 @@ def capture():
     atrace_args.append('-u')
   if options.trace_workqueue:
     atrace_args.append('-w')
-  if options.trace_time is not None:
-    if options.trace_time > 0:
-      atrace_args.extend(['-t', str(options.trace_time)])
-    else:
-      parser.error('the trace time must be a positive number')
   if options.trace_buf_size is not None:
     if options.trace_buf_size > 0:
       atrace_args.extend(['-b', str(options.trace_buf_size)])
@@ -163,7 +163,7 @@ def capture():
         for i, line in enumerate(lines):
           #if line == 'TRACE:\n':
           if True:  # xzl 
-            sys.stdout.write("downloading trace...")
+            sys.stdout.write("collecting trace...")
             sys.stdout.flush()
             #out = ''.join(lines[i+1:])
             out = ''.join(lines[i:]) #xzl: don't skip any line
