@@ -1,0 +1,8 @@
+# Capturing
+# with android device connected
+top-capture.py -o ./top.trace
+
+# Post processing
+top-process.py
+gnuplot-4.6 top.plot
+display top.png
