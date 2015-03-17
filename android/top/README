@@ -1,6 +1,6 @@
 # Capturing
 # with android device connected
-top-capture.py -t 10 -o ./top.trace
+top-capture.py -t 20 -d 1 -o ./top.trace
 
 # Post processing
 top-process.py

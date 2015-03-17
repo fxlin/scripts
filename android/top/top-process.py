@@ -106,10 +106,14 @@ def get_notable_tasks():
   
   assert updates != []
   
+  # We are interested tasks either use high cpu% or ranked highly 
+  # (so that we don't end up with no tasks at all).
+  #
+  # Assuming top output is ranked by the CPU %.
   for u in updates:
-    for d in u:
+    for rank, d in enumerate(u):
       cpu = int(d['CPU%'][:-1]) # have to strip the % symbol
-      if cpu >= 5:  # 5%
+      if rank == 0 or cpu >= 5:  # 5%
         task = (d['Name'], d['PID'])
         if not task in notable_tasks:
           notable_tasks.append(task)

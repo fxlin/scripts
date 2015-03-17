@@ -97,7 +97,7 @@ def capture():
     return
 
   # xzl: the actual adb command
-  atrace_args = ['adb', 'shell', 'top']
+  atrace_args = ['adb', 'shell', 'top', '-d', '1']
   add_adb_serial(atrace_args, options.device_serial)
 
   # --- xzl: parsing cmdline and add to target cmd as needed --- 
