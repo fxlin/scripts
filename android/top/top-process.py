@@ -176,6 +176,8 @@ def output_notable_tasks_cpu():
   print >> sys.stderr, "Wrote data file: %s" %fname
 
 
+# Stacked graph idea:
+# https://newspaint.wordpress.com/2013/09/11/creating-a-filled-stack-graph-in-gnuplot/
 # this requires gnuplot >=4.6 for sum()
 # return a string. 
 def _gen_gnuplot_script():
@@ -193,6 +195,7 @@ set datafile separator " "
 #set terminal x11
 set terminal png size 480,400 enhanced truecolor font 'Verdana,9'
 set output "top.png"
+set yrange [0:100]
 set ylabel "CPU"
 set xlabel "Sample"
 set pointsize 0.8
