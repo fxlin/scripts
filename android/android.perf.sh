@@ -1,7 +1,7 @@
 #
 # run perf on android and associate the data with host symbols
 # in aosp.
-#
+# ref: https://code.google.com/p/chromium/wiki/ProfilingContentShellOnAndroid
 
 ###################################
 #	prepare kernel symbols
@@ -27,6 +27,8 @@ adb shell echo 'echo 0 > /proc/sys/kernel/kptr_restrict' \| su
 # should be 0
 adb shell cat /proc/sys/kernel/kptr_restrict
 
+# -a: all cpus
+# -g: capture call graphs
 adb shell perf record -o /sdcard/perf.data -F 99 -ag -- sleep 10
 adb pull /sdcard/perf.data
 scp perf.data office:/tmp/
