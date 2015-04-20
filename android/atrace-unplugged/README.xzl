@@ -1,0 +1,4 @@
+# host
+source env-trace.sh
+
+# and see help messages
