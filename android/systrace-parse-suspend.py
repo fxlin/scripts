@@ -30,7 +30,7 @@ end_ts = 0
 last_ts = 0
 last_suspend = 0
 last_resume = 0
-last_resume_fix = 0  # resume, after clock rollback
+last_resume_fix = -1  # resume, after clock rollback
 
 if __name__ == '__main__':
   f=file(sys.argv[1])
@@ -98,7 +98,10 @@ if __name__ == '__main__':
     if len(t) <= 1:
       continue
     elif t[1].find("begin") != -1:
-      print "[%d]suspends. online for %.6f (%.6f -- %.6f)" %(i, ts - last_resume_fix, last_resume_fix, ts)
+      if last_resume_fix > 0:
+        print "[%d]suspends. online for %.6f (%.6f -- %.6f)" %(i, ts - last_resume_fix, last_resume_fix, ts)
+      else:
+        print "[%d]suspends. online for ??? (??? -- %.6f)" %(i, ts)
       last_suspend = ts
     elif t[1].find("end") != -1:
       print "[%d]resumes. offline for %.6f (%.6f -- %.6f)" %(i, ts - last_suspend, last_suspend, ts)
