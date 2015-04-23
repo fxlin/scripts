@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 
 """ 
-parse the sched events from systrace html output (which is captured by atrace on Android). 
-output sched statistics. e.g, how many tasks, how many ctx switches.
+parse the suspend/resume events from systrace html output (which is captured by atrace on Android). 
+output suspend/resume epochs. 
+monotonic clock rollback is treated.
 
 Usage:
 {prog} out.html
