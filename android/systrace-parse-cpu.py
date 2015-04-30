@@ -109,6 +109,8 @@ once = True
 
 begin_ts = 0
 end_ts = 0
+begin_window_ts = -1
+end_window_ts = -1
 last_ts = 0
 last_suspend = 0
 last_resume = 0
@@ -197,8 +199,17 @@ if __name__ == '__main__':
       ts = float(timestamp)
       if ts < min_t:   # XXX improve this. 
         continue
+      elif begin_window_ts < 0: 
+        begin_window_ts = ts
+        print "---- update begin --- ", ts
+        
       if ts > max_t:
+        if end_window_ts < 0:
+          end_window_ts = ts
+          print "---- update end --- ", ts
         continue
+        
+
 
       if not once:
         # sanity check
@@ -212,6 +223,10 @@ if __name__ == '__main__':
         if t > 1:
           print "--- BUG?! last_ts %.6f t = %.6f--- line %d" %(last_ts, t, i)
         
+        # manual fix the pid: if equals "-----", this means pid == tid
+        if prev_pid == "-----":
+          prev_pid = prev_tid
+          
         # first time see the pid
         if not prev_pid in all_pids:
           all_pids[prev_pid] = {}
@@ -219,7 +234,8 @@ if __name__ == '__main__':
         # first time see the tid
         if not prev_tid in d:
           d[prev_tid] = []
-        # record the time slice XXX more info?
+        # record the time slice 
+        # add XXX more info?
         d[prev_tid].append(t)
         
         # sanity check
@@ -236,3 +252,4 @@ if __name__ == '__main__':
   
   statistics()
   print "total elapsed %.6f" %(ts - begin_ts)
+  print "window  %.6f" %(end_window_ts - begin_window_ts)
