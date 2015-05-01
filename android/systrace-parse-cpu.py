@@ -126,6 +126,10 @@ all_pids={}
 # for sanity check. key: tid, value: (pid, comm)
 all_tids={}
 
+# if dmtrace is supplied, loaded tids & comms
+# key:tid, value:comm
+dmtrace_tids={}
+
 def statistics():
   global all_pids, all_tids
   all_t = 0.0
@@ -154,7 +158,54 @@ def statistics():
     print
   
   print "all cpu slices %.6f sched %d" %(all_t, all_sched)
+
+'''
+load thread list from dmtrace header. 
+this looks like:
+*threads
+618	main
+621	Heap thread pool worker thread 0
+693	AlarmManager
+694	InputDispatcher
+695	InputReader
+...
+'''
+listregex=r'''(\d+)\s+(.+)'''
+dmtrace_main_tid = None    # as loaded from the dmtrace
+
+def build_dmtrace_threadlist(fname):
+  global dmtrace_main_tid
   
+  f=file(fname)
+  lines=f.readlines()
+  flag = False   # have we entered the thread list?
+  
+  for line in lines:
+    if line.find("*methods") != -1: # done reading thread list. 
+      print "%d threads loaded from dmtrace" %(len(dmtrace_tids))
+      if not dmtrace_main_tid:
+        print "--- BUG: couldn't find the main thread from dmtrace----"
+      else:
+        print "main:", dmtrace_main_tid 
+      return
+    
+    if line.find("*threads") != -1: # we start reading thread list
+      flag = True    
+      continue
+    
+    if flag:
+      m = re.match(listregex, line)
+      if not m:
+        print "---BUG?? can't parse thread list "
+        print line
+      else:
+        if m.group(1) in dmtrace_tids:
+          print "---BUG? saw %s before in thread list ---" %m.group(1)
+        dmtrace_tids[m.group(1)] = m.group(2)
+        if m.group(2) == "main":
+          dmtrace_main_tid = m.group(1)
+  
+    
 # the time range we are interested, in sec.
 min_t = 0.0
 max_t = float("inf")
@@ -167,6 +218,9 @@ if __name__ == '__main__':
     min_t = float(sys.argv[2])
     max_t = float(sys.argv[3])
   
+  if len(sys.argv) > 4: # if dmtrace is supplied, we load thread list from the dmtrace
+    build_dmtrace_threadlist(sys.argv[4])
+    
   inheader = True
   nlines = len(lines)
   
@@ -238,9 +292,13 @@ if __name__ == '__main__':
         if t > 1:
           print "--- BUG?! last_ts %.6f t = %.6f--- line %d" %(last_ts, t, i)
         
-        # manual fix the pid: if equals "-----", this means pid == tid
+        # manual fix the pid: if equals "-----", we can only guess
         if prev_pid == "-----":
-          prev_pid = prev_tid
+          if prev_tid in dmtrace_tids:  # if dmtrace has claimed this tid to be part of it
+            prev_pid = dmtrace_main_tid
+            print "--------------------", dmtrace_main_tid
+          else:  # no information, we guess this tid has its own process
+            prev_pid = prev_tid
           
         # first time see the pid
         if not prev_pid in all_pids:
