@@ -105,6 +105,7 @@ def parseline(line):
   else:
     return (m.group(3), m.group(5), m.group(2), m.group(1), m.group(8), m.group(9))
 
+once_in_trace = True   # first entry in the trace; may be out of window
 once = True
 
 begin_ts = 0
@@ -112,6 +113,7 @@ end_ts = 0
 begin_window_ts = -1
 end_window_ts = -1
 last_ts = 0
+last_checked_ts = 0 # although we may skipped this (e.g, out of window)
 last_suspend = 0
 last_resume = 0
 last_resume_fix = -1  # resume, after clock rollback
@@ -126,6 +128,8 @@ all_tids={}
 
 def statistics():
   global all_pids, all_tids
+  all_t = 0.0
+  all_sched = 0
   
   for (pid, d) in all_pids.iteritems():
     pid_sched = 0
@@ -145,8 +149,11 @@ def statistics():
       print "     tid: %s %s time: %.6f sched: %d" %(tid, all_tids[tid][1], tid_t, tid_sched)
       
     print "total: time: %.6f sched: %d" %(pid_t, pid_sched)
+    all_t += pid_t
+    all_sched += pid_sched
     print
   
+  print "all cpu slices %.6f sched %d" %(all_t, all_sched)
   
 # the time range we are interested, in sec.
 min_t = 0.0
@@ -197,6 +204,14 @@ if __name__ == '__main__':
       #print prev_tid, "->", next_tid
       
       ts = float(timestamp)
+      
+      if once_in_trace:
+        begin_ts = ts
+        once_in_trace = False
+
+      last_checked_ts = ts
+      
+
       if ts < min_t:   # XXX improve this. 
         continue
       elif begin_window_ts < 0: 
@@ -244,12 +259,16 @@ if __name__ == '__main__':
         if all_tids[prev_tid][0] != prev_pid:
           print "--- BUG --- !"
       else:
-        begin_ts = ts
+        #begin_ts = ts
         once = False
       
       last_ts = ts
       last_tid = next_tid
   
   statistics()
-  print "total elapsed %.6f" %(ts - begin_ts)
-  print "window  %.6f" %(end_window_ts - begin_window_ts)
+  print "total trace time [ %.6f %.6f ] %.6f" %(begin_ts, last_checked_ts, last_checked_ts - begin_ts)
+  
+  if end_window_ts < 0: # we haven't got a chance to update it yet, meaning we haven't hit max_t
+    end_window_ts = last_ts
+    
+  print "window  [ %.6f %.6f ] %.6f" %(begin_window_ts, end_window_ts, end_window_ts - begin_window_ts)
