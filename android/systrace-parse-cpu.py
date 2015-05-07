@@ -218,7 +218,7 @@ if __name__ == '__main__':
     min_t = float(sys.argv[2])
     max_t = float(sys.argv[3])
   
-  if len(sys.argv) > 4: # if dmtrace is supplied, we load thread list from the dmtrace
+  if len(sys.argv) > 4: # if dmtrace is supplied, we load the thread list from the dmtrace
     build_dmtrace_threadlist(sys.argv[4])
     
   inheader = True
@@ -270,12 +270,12 @@ if __name__ == '__main__':
         continue
       elif begin_window_ts < 0: 
         begin_window_ts = ts
-        print "---- update begin --- ", ts
+        print "---- window begin --- ", ts
         
       if ts > max_t:
         if end_window_ts < 0:
           end_window_ts = ts
-          print "---- update end --- ", ts
+          print "---- window end --- ", ts
         continue
         
 
@@ -296,7 +296,7 @@ if __name__ == '__main__':
         if prev_pid == "-----":
           if prev_tid in dmtrace_tids:  # if dmtrace has claimed this tid to be part of it
             prev_pid = dmtrace_main_tid
-            print "--------------------", dmtrace_main_tid
+            # print "--------------------", dmtrace_main_tid
           else:  # no information, we guess this tid has its own process
             prev_pid = prev_tid
           
@@ -324,9 +324,12 @@ if __name__ == '__main__':
       last_tid = next_tid
   
   statistics()
+  
+  print "input trace: ", os.path.realpath(sys.argv[1])
   print "total trace time [ %.6f %.6f ] %.6f" %(begin_ts, last_checked_ts, last_checked_ts - begin_ts)
   
   if end_window_ts < 0: # we haven't got a chance to update it yet, meaning we haven't hit max_t
     end_window_ts = last_ts
     
   print "window  [ %.6f %.6f ] %.6f" %(begin_window_ts, end_window_ts, end_window_ts - begin_window_ts)
+  
